@@ -1,0 +1,125 @@
+<domain type='kvm'>
+
+  <!-- name of the VM, this will be used for all 'virsh' operations -->
+  <name>my-cool-vm</name>
+
+  <!-- unique ID of the VM, must be unique (who'd've guessed) and can easiey be generated with 'uuid' in a shell -->
+  <uuid>fdeea648-cb19-11ed-9ca4-834c5ea1d12f</uuid>
+
+  <!-- [OPTIONAL] nice, human readable name of the VM -->
+  <title>My Cool VM</title>
+
+  <!-- [OPTIONAL] nice, human readable description of this VM -->
+  <description>Demo Win10 Install</description>
+
+  <!-- how much RAM does this VM have -->
+  <memory unit='KiB'>8388608</memory>
+  <currentMemory unit='KiB'>8388608</currentMemory>
+
+  <!-- How many CPUs does this VM have -->
+  <vcpu>8</vcpu>
+  <cpu mode='host-passthrough'>
+  <!-- specific VM CPU configuration, important for Windows guests that can't have more than 2 phys. CPUs -->
+    <topology sockets='1' dies='1' cores='4' threads='2'/>
+    <cache mode='passthrough'/>
+    <!-- set this to 'disable' to not let the guest OS know it's running in a VM -->
+    <feature policy='optional' name='hypervisor'/>
+  </cpu>
+
+  <cputune>
+    <!-- unitless value to determine how much CPU a VM get when the host is on 100% load -->
+    <shares>1000</shares>
+  </cputune>
+
+  <!-- machine config, usually no need to change anything here, besides the path to the OVMF_VARS.fd file -->
+  <os>
+    <type arch='x86_64' machine='pc-i440fx-5.2'>hvm</type>
+    <loader readonly='yes' type='pflash'>/usr/share/OVMF/OVMF_CODE.fd</loader>
+    <nvram>/data/vms/my-super-vm/OVMF_VARS.fd</nvram> <!-- << change this path to match your setup -->
+    <bootmenu enable='yes' timeout='7000'/>
+  </os>
+
+  <features>
+    <acpi/>
+    <apic/>
+    <pae/>
+    <kvm>
+      <!-- set this to 'on' to not let the guest OS know it's running in a VM -->
+      <hidden state='off'/>
+    </kvm>
+  </features>
+  <clock offset='localtime'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>restart</on_crash>
+  <pm>
+    <suspend-to-mem enabled='yes'/>
+    <suspend-to-disk enabled='yes'/>
+  </pm>
+  <devices>
+
+    <emulator>/usr/bin/qemu-system-x86_64</emulator>
+
+    <!-- virtual harddrive of the VM - change path to match your setup -->
+    <disk type='file' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source file='/data/vms/my-super-vm/hdd1.raw'/>
+      <target dev='vda' bus='virtio'/>
+      <serial>MYVM01-HDD01</serial> <!-- [OPTINIOL / PRETTY USELESS] set the serial number of the HDD here -->
+    </disk>
+
+    <!-- virtual DVD drive for the OS installation ISO -->
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='/data/win10.iso'/>
+      <target dev='sdb' bus='sata'/>
+      <readonly/>
+    </disk>
+
+    <!-- virtual DVD drive for the windows virtio drivers (obv. only needed when installing a Windows guest) -->
+    <disk type='file' device='cdrom'>
+      <driver name='qemu' type='raw'/>
+      <source file='/data/virtio-win.iso'/>
+      <target dev='sdb' bus='sata'/>
+      <readonly/>
+    </disk>
+
+    <!-- virtual NIC, connected to host-only virtual network (see network template XML) -->
+    <interface type='network'>
+      <mac address='48:43:00:ca:09:01'/>
+      <source network='vmnet1'/> <!-- << change this to the name of your virtual network -->
+      <model type='virtio'/>
+    </interface>
+
+    <!-- virtual NIC, connected to a network bridge device on the host -->
+    <interface type='bridge'>
+      <mac address='ca:ca:ca:00:04:01'/>
+      <source bridge='br0'/> <!-- << change this to the name of the bridge device -->
+      <model type='virtio'/>
+    </interface>
+
+
+    <input type='tablet' bus='usb'>
+    </input>
+
+    <!-- [OPTIONAL] VNC config to connect to the console of the VM via VNC client -->
+    <graphics type='vnc' port='5900' autoport='no' listen='127.0.0.1' keymap='de'>
+    </graphics>
+
+    <!-- graphpics adapter of the VM -->
+    <video>
+      <model type='virtio'/>
+    </video>
+
+    <!-- serial port/console, usually use to connect to like ttyS0 on Linux guests -->
+    <serial type='pty'>
+      <target type='isa-serial' port='0'>
+        <model name='isa-serial'/>
+      </target>
+    </serial>
+    <console type='pty'>
+      <target type='serial' port='0'/>
+    </console>
+
+  </devices>
+</domain>

@@ -1,0 +1,27 @@
+<network>
+  <!-- name of the virtual network, used for 'virsh' commands and identifing the virtual network in VM definition -->
+  <name>vmnet1</name>
+
+  <!-- unique ID of this definition -->
+  <uuid>fa57212a-bd01-11ed-9927-9355c7e43f4b</uuid>
+
+  <!-- MAC address of the virtual host network device inside this network -->
+  <mac address='48:43:00:CA:99:01'/>
+  <forward mode='nat'>
+    <nat>
+      <!-- IP address (range) of the host -->
+      <address start='10.11.12.13' end='10.11.12.13'/>
+    </nat>
+  </forward>
+
+  <!-- the name of the auto-created network bridge -->
+  <bridge name='virbr1' stp='on' delay='0'/>
+
+  <!-- IP address of the host gateway of the virtual network-->
+  <ip address='192.168.241.10' netmask='255.255.255.0'>
+    <dhcp>
+      <!-- DHCP IP address range of the private/virtual network -->
+      <range start='192.168.241.100' end='192.168.241.199'/>
+    </dhcp>
+  </ip>
+</network>
