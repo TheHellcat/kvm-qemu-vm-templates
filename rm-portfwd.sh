@@ -17,5 +17,10 @@ SRCPORT=$1
 DSTPORT=$2
 DSTADDR=$3
 
+# TCP forward
 iptables -t nat -D PREROUTING -p tcp -d $HOSTIP --dport $SRCPORT -j DNAT --to $DSTADDR:$DSTPORT
 iptables -D FORWARD -d $DSTADDR/32 -p tcp -m state --state NEW -m tcp --dport $DSTPORT -j ACCEPT
+
+# UDP forward
+iptables -t nat -D PREROUTING -p udp -d $HOSTIP --dport $SRCPORT -j DNAT --to $DSTADDR:$DSTPORT
+iptables -D FORWARD -d $DSTADDR/32 -p udp -m state --state NEW -m udp --dport $DSTPORT -j ACCEPT
