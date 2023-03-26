@@ -1,0 +1,23 @@
+About adding additional fixed DHCP IP addresses for VMs during runtime:
+
+The problem:
+If you add additional <host> entries to the vnet definition via 'virsh net-edit vmnetname', the virtual network needs to be restarted (i.e. 'virsh net-destroy' and 'virsh net-start') for the new entries to be picked up and used.
+BUT: restarting the virtual network like this makes ALL VMs using it to loose their network connectivity until being fully shutdown/powered off and restarted themselfs.
+
+Usually not what we want.
+
+The solution:
+We can add a new host entry to the currently active network by putting only the <host> node into a seperate XML file:
+
+<host mac='ca:ca:ca:03:01:01' name='lab1' ip='192.168.241.203'/>
+
+And then add it via:
+
+virsh net-update vmnetworkname add ip-dhcp-host hostentry.xml
+(change "vmnetworkname" to match your setup, ofc.)
+
+HOWEVER: this now only applies to the currently running network and is lost upon restarting it.
+
+SO: to have it both ways, "now" and "forever", just do both. "virsh net-edit" for the permanent definition and "virsh net-update" to apply it to the currently running instance.
+
+Yay :-)

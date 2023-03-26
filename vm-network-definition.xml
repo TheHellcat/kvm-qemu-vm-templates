@@ -24,6 +24,7 @@
       <range start='192.168.241.100' end='192.168.241.199'/>
 
       <!-- using entries like this, you can assign a fixed IP to the VM with the given MAC -->
+      <!-- see fixed-dhcp-address-at-runtime.txt on how to add entries while the system is up -->
       <host mac='00:11:22:33:44:55' name='mysuperdupervm01' ip='192.168.241.201'/>
       <host mac='00:11:22:33:44:66' name='mysuperdupervm02' ip='192.168.241.202'/>
     </dhcp>
